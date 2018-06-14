@@ -32,10 +32,20 @@ def _event_handler(event_type, slack_event):
 
     """
     team_id = slack_event["team_id"]
+    print "event: ", slack_event
     # ================ Team Join Events =============== #
     # When the user first joins a team, the type of event will be team_join
     if event_type == "team_join":
         user_id = slack_event["event"]["user"]["id"]
+        # Send the onboarding message
+        pyBot.onboarding_message(team_id, user_id)
+        return make_response("Welcome Message Sent", 200,)
+
+    # ================ Team Join Events =============== #
+    # When the user first joins a team, the type of event will be team_join
+    elif event_type == "message":
+        user_id = slack_event["event"]["user"]
+        # user_id = slack_event["event"]["username"]
         # Send the onboarding message
         pyBot.onboarding_message(team_id, user_id)
         return make_response("Welcome Message Sent", 200,)
@@ -98,6 +108,8 @@ def thanks():
     # Let's grab that temporary authorization code Slack's sent us from
     # the request's parameters.
     code_arg = request.args.get('code')
+    print "code_arg: ", code_arg
+    # print code_arg
     # The bot's auth method to handles exchanging the code for an OAuth token
     pyBot.auth(code_arg)
     return render_template("thanks.html")
@@ -130,6 +142,7 @@ def hears():
         # By adding "X-Slack-No-Retry" : 1 to our response headers, we turn off
         # Slack's automatic retries during development.
         make_response(message, 403, {"X-Slack-No-Retry": 1})
+        print "make_response: ", make_response
 
     # ====== Process Incoming Events from Slack ======= #
     # If the incoming request is an Event we've subcribed to

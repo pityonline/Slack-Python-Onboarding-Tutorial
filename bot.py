@@ -11,7 +11,7 @@ from slackclient import SlackClient
 # associated with each team, we can store this information in memory on
 # as a global object. When your bot is out of development, it's best to
 # save this in a more persistant memory store.
-authed_teams = {}
+authed_teams = {"chinaunix": "chinaunix.slack.com"}
 
 
 class Bot(object):
@@ -62,12 +62,14 @@ class Bot(object):
                                 client_secret=self.oauth["client_secret"],
                                 code=code
                                 )
+        print auth_response
         # To keep track of authorized teams and their associated OAuth tokens,
         # we will save the team ID and bot tokens to the global
         # authed_teams object
         team_id = auth_response["team_id"]
         authed_teams[team_id] = {"bot_token":
                                  auth_response["bot"]["bot_access_token"]}
+        print authed_teams
         # Then we'll reconnect to the Slack Client with the correct team's
         # bot token
         self.client = SlackClient(authed_teams[team_id]["bot_token"])
@@ -89,6 +91,9 @@ class Bot(object):
         """
         new_dm = self.client.api_call("im.open",
                                       user=user_id)
+        print "user_id: ", user_id
+        print "new_dm: ", new_dm
+        print "keys: ", new_dm.keys()
         dm_id = new_dm["channel"]["id"]
         return dm_id
 
